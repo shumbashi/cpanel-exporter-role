@@ -1,0 +1,4 @@
+---
+# defaults file for cpanel-exporter-role
+
+cpanel_exporter_port: 9100

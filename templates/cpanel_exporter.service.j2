@@ -1,0 +1,15 @@
+[Unit]
+Description=Prometheus cPanel Exporter
+Documentation=https://github.com/ralfonso-directnic/cpanel_exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+ExecStart=/usr/local/bin/cpanel_exporter \
+    -port {{ cpanel_exporter_port }}
+
+[Install]
+WantedBy=multi-user.target
