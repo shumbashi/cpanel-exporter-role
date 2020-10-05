@@ -1,12 +1,19 @@
 ---
 # tasks file for cpanel-exporter-role
 
+# Chack if this is a cPanel server
+- name: Check if cPanel is installed
+  stat:
+    path: /usr/local/cpanel/version
+  register: cpanel_installed
+
 - name: Download cpanel_exporter
   get_url:
     url: "https://github.com/ralfonso-directnic/cpanel_exporter/releases/download/1.0/cpanel_exporter-1.0.linux.amd64"
     dest: /usr/local/bin/cpanel_exporter
     mode: "+x"
   become: true
+  when: cpanel_installed.stat.exists
 
 # Create systemd service file from template
 - name: Create systemd service file from template
@@ -14,6 +21,7 @@
     dest: /etc/systemd/system/cpanel_exporter.service
     src: cpanel_exporter.service.j2
   become: true
+  when: cpanel_installed.stat.exists
 
 # Enable and start service
 
@@ -24,3 +32,4 @@
     state: started
     daemon_reload: yes
   become: true
+  when: cpanel_installed.stat.exists
