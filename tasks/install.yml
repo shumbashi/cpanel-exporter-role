@@ -1,0 +1,35 @@
+# Download cpanel_exporter binary
+- name: Check latest cpanel_exporter
+  uri:
+    url: https://api.github.com/repos/shumbashi/cpanel_exporter/releases/latest
+    return_content: true
+  register: cpanelexporter_latest
+  become: true
+
+- name: "Installing cpanel_exporter {{ cpanelexporter_latest.json.tag_name }}"
+  loop: "{{ cpanelexporter_latest.json.assets }}"
+  when: "'linux.amd64' in item.name"
+  get_url:
+    url: "{{ item.browser_download_url }}"
+    dest: "/usr/local/bin/cpanel_exporter"
+    mode: "+x"
+  become: true
+
+# Create systemd service file from template
+- name: Create systemd service file from template
+  template:
+    dest: /etc/systemd/system/cpanel_exporter.service
+    src: cpanel_exporter.service.j2
+  become: true
+  when: cpanel_installed.stat.exists
+
+# Enable and start service
+
+- name: Enable and start service
+  systemd:
+    name: cpanel_exporter
+    enabled: true
+    state: started
+    daemon_reload: yes
+  become: true
+  when: cpanel_installed.stat.exists
