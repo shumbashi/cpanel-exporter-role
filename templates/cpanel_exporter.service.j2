@@ -7,7 +7,8 @@ After=network-online.target
 [Service]
 Type=simple
 ExecReload=/bin/kill -HUP $MAINPID
-Restart=on-failure
+Restart=always
+RestartSec=1
 ExecStart=/usr/local/bin/cpanel_exporter \
     -port {{ cpanel_exporter_port }}
 
